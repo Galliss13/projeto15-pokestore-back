@@ -32,6 +32,30 @@ const userSchema = joi.object({
     repassword: joi.string().required().min(3)
 })
 
+//Rota de cadastro
+
+app.post('/signup', async (req,res) => {
+    
+    //valida os campos (possível middleware)
+    
+    const user = req.body;
+    const { error } = userSchema.validate(user, { abortEarly: false });
+    if (error) {
+      const errors = error.details.map((detail) => detail.message);
+      return res.status(400).send(errors);
+    }    
+
+    // criptografa a senha e insere usuário no banco de dados
+
+    const passwordHash = bcrypt.hashSync(user.password, 10);
+    try{
+        await usersCollection.insertOne({...user, password: passwordHash})
+    } catch(err) {
+        console.log(err)
+        res.sendStatus(500)
+    }
+})
+
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`app running in port ${port}`))
