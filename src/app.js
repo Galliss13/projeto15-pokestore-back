@@ -24,6 +24,7 @@ try {
 }
 const usersCollection = db.collection("users")
 const sessionsCollection = db.collection("sessions")
+const cartCollection = de.collection("cart")
 
 //Schemas
 
@@ -94,6 +95,48 @@ app.post ('/signin', async (req,res) => {
     }
 })
 
+//Rota do carrinho
+
+app.post ('/cart', async (req,res) => {
+    
+    // autenticação do usuário (possível middleware)
+
+    const { authorization } = req.header
+    const token = authorization?.replace('Bearer ', '')
+    let user
+    if (!token) {
+        res.sendStatus(401)
+        return
+    }
+    try {
+        const sessionUser = await sessionsCollection.findOne({token})
+        if (!sessionUser) {
+            res.sendStatus(401)
+            return
+        }
+        user = await usersCollection.findOne({_id: sessionUser?.userId})
+        if (!user) {
+            res.sendStatus(401)
+            return
+        }
+    } catch(err) {
+        console.log(err)
+        res.sendStatus(500)
+    }
+
+    // inserção do produto selecionado ao carrinho
+
+    const product = req.body
+    try {
+        await cartCollection.insertOne({
+            email: user.email,
+            productId: product.id
+        })
+    } catch(err) {
+        console.log(err);
+        res.sendStatus(500)
+    } 
+}) 
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`app running in port ${port}`))
