@@ -23,5 +23,15 @@ try {
     console.log(err);
 }
 
+//Schemas
+
+const userSchema = joi.object({
+    name: joi.string().required().min(3),
+    email: joi.string().email().required(),
+    password: joi.string().required().min(3),
+    repassword: joi.string().required().min(3)
+})
+
+
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`app running in port ${port}`))
