@@ -2,6 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import { MongoClient } from 'mongodb'
 import joi from 'joi'
+import bcrypt from 'bcrypt'
+import { v4 as uuidV4} from 'uuid'
 
 import dotenv from 'dotenv'
 dotenv.config()
@@ -17,11 +19,11 @@ let db
 try {
     await mongoClient.connect()
     db = mongoClient.db("pokestore")
-    const usersCollection = db.collection("users")
-    const sessionsCollection = db.collection("sessions")
 } catch (err) {
     console.log(err);
 }
+const usersCollection = db.collection("users")
+const sessionsCollection = db.collection("sessions")
 
 //Schemas
 
@@ -52,6 +54,42 @@ app.post('/signup', async (req,res) => {
         await usersCollection.insertOne({...user, password: passwordHash})
     } catch(err) {
         console.log(err)
+        res.sendStatus(500)
+    }
+})
+
+//Rota de login
+
+app.post ('/signin', async (req,res) => {
+    
+    //verifica dados do usuário (possível middleware)
+
+    const { email, password } = req.body
+    let user
+    try {
+        user = await usersCollection.findOne(email)
+        if (!user) {
+            res.sendStatus(401)
+            return
+        }
+        const isValidPassword = bcrypt.compare(password, user.password)
+        if (!isValidPassword) {
+            res.sendStatus(401)
+            return
+        }
+    } catch(err) {
+        console.log(err)
+        res.sendStatus(500)
+    }
+
+    //cria uma nova sessão com um novo token de autenticação
+
+    const token = uuidV4()
+    try {
+        await sessionsCollection.insertOne({token, userId: user._id})
+        res.send({token})
+    } catch (err) {
+        console.log(err);
         res.sendStatus(500)
     }
 })
