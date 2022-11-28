@@ -39,8 +39,6 @@ import poison_gem from "./Jewels/poison-gem.png"
 import psychic_gem from "./Jewels/psychic-gem.png"
 import water_gem from "./Jewels/water-gem.png"
 
-
-
 export {
     black_apricorn,
     blue_apricorn,

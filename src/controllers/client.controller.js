@@ -10,12 +10,26 @@ export async function postProductIntoCart (req, res) {
     try {
         await cartCollection.insertOne({
             email: user.email,
-            productId: product._id
+            description: product.description,
+            productId: product._id,
+            image: product.image,
+            name: product.name,
+            amount: product.amount
         })
     } catch(err) {
         console.log(err);
         res.sendStatus(500)
     } 
+}
+
+export async function getCartProducts (req, res) {
+    try {
+        const cartProducts = await cartCollection.find().toArray()
+        res.status(200).send(cartProducts)
+    } catch (err) {
+        console.log(err)
+        res.sendStatus(500)
+    }
 }
 
 export async function deleteProductInCart (req, res) {
