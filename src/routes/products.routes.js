@@ -6,6 +6,6 @@ import { authTokenValidation } from "../middlewares/authValidation.middleware.js
 
 const router = Router();
 
-router.get("/products", authTokenValidation, getProducts);
+router.get("/store", authTokenValidation, getProducts);
 
 export default router;
