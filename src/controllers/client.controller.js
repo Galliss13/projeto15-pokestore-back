@@ -1,4 +1,4 @@
-import { cartCollection } from "../database/db";
+import { cartCollection } from "../database/db.js";
 
 export async function postProductIntoCart (req, res) {
 

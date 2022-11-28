@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   postProductIntoCart,
   deleteProductInCart,
-} from "../controllers/client.controller";
+} from "../controllers/client.controller.js";
 import { authTokenValidation } from "../middlewares/authValidation.middleware.js";
 
 const router = Router();
